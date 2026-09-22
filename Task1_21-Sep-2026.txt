@@ -1,0 +1,109 @@
+Task 1 – Self Introduction Component
+
+1. App.jsx
+==========
+import SelfIntroduction from "./components/SelfIntroduction";
+
+function App() {
+  return (
+    <div>
+      <SelfIntroduction />
+    </div>
+  );
+}
+
+export default App;
+
+2. main.jsx
+===========
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+3. SelfIntroduction.jsx
+========================
+import "./SelfIntroduction.css";
+
+function SelfIntroduction() {
+  return (
+    <div className="card">
+      <h1>SK D Thahera</h1>
+      <h2>Python Fullstack Engineer</h2>
+
+      <p><b>Education:</b> B Tech - JNTUA University Anantapur</p>
+
+      <p>
+        <b>Skills:</b> HTML, CSS, JavaScript, React, Python, Django, FastAPI, SQL
+      </p>
+
+      <p>
+        <b>Experience:</b> 1+ years of IT experience with experience
+        in Python, Django, and Fullstack Development.
+      </p>
+
+      <p>
+        <b>Hobbies:</b> Learning new technologies, writing code.
+      </p>
+
+      <p>
+        <b>Career Goal:</b> To grow as a skilled Python Full 
+        Stack Developer by building scalable and user-friendly web applications.”
+      </p>
+    </div>
+  );
+}
+
+export default SelfIntroduction;
+
+4.SelfIntroduction.css
+==================
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+}
+
+.card {
+  width: 600px;
+  margin: 80px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px #ccc;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+p {
+  line-height: 1.6;
+}
+
+5.Index.html
+==========
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Self Introduction</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
