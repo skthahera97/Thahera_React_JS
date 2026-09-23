@@ -1,0 +1,221 @@
+Task 2 – Implement Props
+
+1. App.jsx
+==========
+import React from 'react';
+import UserCard from './UserCard';
+
+const App = () => {
+  // Array of 5 user datasets (each containing 5 details)
+  const usersData = [
+    {
+      id: 1,
+      name: 'SK D Thahera',
+      city: 'Hyderabad',
+      age: 29,
+      email: 'thahera.sk@example.com',
+      phone: '+1 (555) 234-5678',
+    },
+    {
+      id: 2,
+      name: 'Dharani',
+      city: 'Chennai',
+      age: 34,
+      email: 'dharani.v@example.com',
+      phone: '+1 (555) 876-5432',
+    },
+    {
+      id: 3,
+      name: 'Naveena',
+      city: 'Mumbai',
+      age: 25,
+      email: 'naveena.r@example.com',
+      phone: '+1 (555) 345-6789',
+    },
+    {
+      id: 4,
+      name: 'Nikhitha',
+      city: 'Kochin',
+      age: 41,
+      email: 'nikhitha.c@example.com',
+      phone: '+1 (555) 901-2345',
+    },
+    {
+      id: 5,
+      name: 'Harika',
+      city: 'Noida',
+      age: 30,
+      email: '.p@example.com',
+      phone: '+1 (555) 678-9012',
+    },
+  ];
+
+  return (
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <h1 style={styles.title}>User Information</h1>
+        {/* <p style={styles.subtitle}>
+          Rendering reusable child components via parent props
+        </p> */}
+      </header>
+
+      {/* Grid container for card layout and responsiveness */}
+      <main style={styles.grid}>
+        {usersData.map((user) => (
+          <UserCard key={user.id} user={user} />
+        ))}
+      </main>
+    </div>
+  );
+};
+
+// Parent Layout Styles
+const styles = {
+  container: {
+    fontFamily: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    backgroundColor: '#f8fafc',
+    minHeight: '100vh',
+    padding: '40px 20px',
+    boxSizing: 'border-box',
+  },
+  header: {
+    textAlign: 'center',
+    marginBottom: '40px',
+  },
+  title: {
+    fontSize: '2rem',
+    color: '#0f172a',
+    margin: '0 0 10px 0',
+  },
+  subtitle: {
+    fontSize: '1rem',
+    color: '#64748b',
+    margin: 0,
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '24px',
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+};
+
+export default App;
+
+2. main.jsx
+===========
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+3. UserCard.jsx
+===============
+import React from 'react';
+
+// Child Component receiving user data via props
+const UserCard = ({ user }) => {
+  return (
+    <div style={styles.card}>
+      <div style={styles.header}>
+        <h2 style={styles.name}>{user.name}</h2>
+        <span style={styles.ageBadge}>{user.age} yrs</span>
+      </div>
+      
+      <div style={styles.details}>
+        <p style={styles.detailItem}>
+          <strong>City:</strong> {user.city}
+        </p>
+        <p style={styles.detailItem}>
+          <strong>Email:</strong> {user.email}
+        </p>
+        <p style={styles.detailItem}>
+          <strong>Phone:</strong> {user.phone}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Inline CSS styles for responsive and clean UI
+const styles = {
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+    border: '1px solid #e2e8f0',
+    display: 'flex',
+    flexDirection: 'column',
+    justify: 'space-between',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
+    borderBottom: '2px solid #f1f5f9',
+    paddingBottom: '12px',
+  },
+  name: {
+    margin: 0,
+    fontSize: '1.25rem',
+    color: '#0f172a',
+    fontWeight: '600',
+  },
+  ageBadge: {
+    backgroundColor: '#e0f2fe',
+    color: '#0369a1',
+    padding: '4px 10px',
+    borderRadius: '20px',
+    fontSize: '0.85rem',
+    fontWeight: '600',
+  },
+  details: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  detailItem: {
+    margin: 0,
+    fontSize: '0.95rem',
+    color: '#334155',
+  },
+};
+
+export default UserCard;
+
+4. index.html
+=============
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Task 2</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.jsx"></script>
+  </body>
+</html><!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Task 2</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
