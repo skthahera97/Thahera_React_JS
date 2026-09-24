@@ -1,0 +1,380 @@
+Task 4 – Implement useState Hook
+
+1. App.jsx
+==========
+import { useState } from "react";
+
+function App() {
+  // Counter state
+  const [count, setCount] = useState(0);
+
+  // Theme state
+  const [isDark, setIsDark] = useState(false);
+
+  // Counter functions
+  const increment = () => {
+    setCount(count + 1);
+  };
+
+  const decrement = () => {
+    setCount(count - 1);
+  };
+
+  const reset = () => {
+    setCount(0);
+  };
+
+  // Theme toggle
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+  };
+
+  return (
+    <div className={isDark ? "app dark" : "app light"}>
+
+      {/* Header */}
+      <div className="header">
+        <h1>React Demo</h1>
+
+        <button className="theme-btn" onClick={toggleTheme}>
+          {isDark ? "☀️ Light Theme" : "🌙 Dark Theme"}
+        </button>
+      </div>
+
+      {/* Main Container */}
+      <div className="container">
+
+        {/* Counter Card */}
+        <div className="card">
+          <h2>Counter</h2>
+
+          <div className="count">
+            {count}
+          </div>
+
+          <div className="button-group">
+            <button
+              className="btn increment"
+              onClick={increment}
+            >
+              + Increment
+            </button>
+
+            <button
+              className="btn decrement"
+              onClick={decrement}
+            >
+              - Decrement
+            </button>
+
+            <button
+              className="btn reset"
+              onClick={reset}
+            >
+              ↻ Reset
+            </button>
+          </div>
+        </div>
+
+        {/* Theme Card */}
+        <div className="card theme-card">
+          <h2>Theme Toggle</h2>
+
+          <p>
+            Current Theme:
+            <strong> {isDark ? "Dark" : "Light"}</strong>
+          </p>
+
+          <button
+            className="toggle-btn"
+            onClick={toggleTheme}
+          >
+            {isDark
+              ? "☀️ Switch to Light Theme"
+              : "🌙 Switch to Dark Theme"}
+          </button>
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <footer>
+        <p>Built with React useState Hook</p>
+      </footer>
+
+    </div>
+  );
+}
+
+export default App;
+
+2. index.css
+=============
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Main Application */
+
+.app {
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+/* Light Theme */
+
+.app.light {
+  background: linear-gradient(135deg, #f5f7fa, #dfe9f3);
+  color: #222;
+}
+
+/* Dark Theme */
+
+.app.dark {
+  background: linear-gradient(135deg, #141e30, #243b55);
+  color: white;
+}
+
+/* Header */
+
+.header {
+  width: 100%;
+  padding: 25px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 30px;
+}
+
+/* Theme Button */
+
+.theme-btn {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #6c63ff;
+  color: white;
+  transition: 0.3s;
+}
+
+.theme-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Main Container */
+
+.container {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+/* Card */
+
+.card {
+  width: 380px;
+  min-height: 300px;
+  padding: 35px;
+  border-radius: 20px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+/* Light Card */
+
+.light .card {
+  background: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark Card */
+
+.dark .card {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Card Heading */
+
+.card h2 {
+  font-size: 26px;
+  margin-bottom: 25px;
+}
+
+/* Counter */
+
+.count {
+  font-size: 65px;
+  font-weight: bold;
+  margin: 20px 0 30px;
+}
+
+/* Buttons */
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Increment */
+
+.increment {
+  background: #22c55e;
+}
+
+/* Decrement */
+
+.decrement {
+  background: #ef4444;
+}
+
+/* Reset */
+
+.reset {
+  background: #f59e0b;
+}
+
+/* Theme Card */
+
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.theme-card p {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+/* Toggle Button */
+
+.toggle-btn {
+  border: none;
+  padding: 14px 22px;
+  border-radius: 12px;
+  background: #6c63ff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Footer */
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+
+  .header {
+    padding: 20px;
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 450px) {
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .count {
+    font-size: 50px;
+  }
+}
+
+3. main.jsx
+============
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+4.index.html
+============
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>React Counter & Theme Toggle</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
