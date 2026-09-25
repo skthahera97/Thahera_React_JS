@@ -1,0 +1,483 @@
+Task 5 – Implement useState Hook for Form Handling
+
+1. App.css
+============
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f4f7;
+  color: #333;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.form-card,
+.submitted-card {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto 25px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.subtitle {
+  text-align: center;
+  color: #777;
+  margin-bottom: 25px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 15px;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #4f46e5;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 7px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #4f46e5;
+  color: white;
+}
+
+.submit-btn:hover {
+  background: #3730a3;
+}
+
+.reset-btn {
+  background: #e5e7eb;
+  color: #333;
+}
+
+.reset-btn:hover {
+  background: #d1d5db;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.submitted-card h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.data-row strong {
+  min-width: 100px;
+}
+
+.data-row span {
+  text-align: right;
+  word-break: break-word;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px 10px;
+  }
+
+  .form-card,
+  .submitted-card {
+    padding: 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .data-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .data-row span {
+    text-align: left;
+  }
+}
+
+2.App.jsx
+==========
+import { useState } from "react";
+import "./App.css";
+
+function App() {
+  const initialFormData = {
+    name: "",
+    email: "",
+    phone: "",
+    age: "",
+    gender: "",
+    city: "",
+    address: "",
+    password: "",
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
+  const [submittedData, setSubmittedData] = useState(null);
+  const [error, setError] = useState("");
+
+  // Handle all input changes
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((previousData) => ({
+      ...previousData,
+      [name]: value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Required field validation
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.age ||
+      !formData.gender ||
+      !formData.city ||
+      !formData.address ||
+      !formData.password
+    ) {
+      setError("Please fill in all fields.");
+      setSubmittedData(null);
+      return;
+    }
+
+    setError("");
+    setSubmittedData(formData);
+  };
+
+  // Handle form reset
+  const handleReset = () => {
+    setFormData(initialFormData);
+    setSubmittedData(null);
+    setError("");
+  };
+
+  return (
+    <div className="container">
+      <div className="form-card">
+        <h1>Registration Form</h1>
+        <p className="subtitle">React useState Form Handling</p>
+
+        <form onSubmit={handleSubmit}>
+          {/* Name */}
+          <div className="form-group">
+            <label htmlFor="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="form-group">
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="Enter phone number"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Age */}
+          <div className="form-group">
+            <label htmlFor="age">Age</label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              placeholder="Enter your age"
+              value={formData.age}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Gender */}
+          <div className="form-group">
+            <label htmlFor="gender">Gender</label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          {/* City */}
+          <div className="form-group">
+            <label htmlFor="city">City</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              placeholder="Enter your city"
+              value={formData.city}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Address */}
+          <div className="form-group">
+            <label htmlFor="address">Address</label>
+            <textarea
+              id="address"
+              name="address"
+              placeholder="Enter your address"
+              value={formData.address}
+              onChange={handleChange}
+              rows="4"
+            ></textarea>
+          </div>
+
+          {/* Password */}
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Error Message */}
+          {error && <p className="error">{error}</p>}
+
+          {/* Buttons */}
+          <div className="button-group">
+            <button type="submit" className="submit-btn">
+              Submit
+            </button>
+
+            <button
+              type="button"
+              className="reset-btn"
+              onClick={handleReset}
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Submitted Data */}
+      {submittedData && (
+        <div className="submitted-card">
+          <h2>Submitted Form Data</h2>
+
+          <div className="data-row">
+            <strong>Name:</strong>
+            <span>{submittedData.name}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Email:</strong>
+            <span>{submittedData.email}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Phone:</strong>
+            <span>{submittedData.phone}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Age:</strong>
+            <span>{submittedData.age}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Gender:</strong>
+            <span>{submittedData.gender}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>City:</strong>
+            <span>{submittedData.city}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Address:</strong>
+            <span>{submittedData.address}</span>
+          </div>
+
+          <div className="data-row">
+            <strong>Password:</strong>
+            <span>{submittedData.password}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+
+
+3. index.css
+============
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f2f4f7;
+  color: #333;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+4. main.jsx
+============
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+5.index.html
+============
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="React useState Form Application"
+    />
+
+    <title>React Form</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+
