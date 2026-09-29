@@ -1,0 +1,396 @@
+Task 7 – Implement useContext & useReducer
+
+1. App.jsx
+==========
+import { CounterProvider } from "./CounterContext";
+import Counter from "./Counter";
+
+function App() {
+  return (
+    <CounterProvider>
+      <div className="app">
+        <Counter />
+      </div>
+    </CounterProvider>
+  );
+}
+
+export default App;
+
+2. Counter.jsx
+==============
+import CounterDisplay from "./CounterDisplay";
+import CounterButtons from "./CounterButtons";
+
+function Counter() {
+  return (
+    <div className="counter-card">
+
+      <div className="header">
+        <h1>Counter App</h1>
+
+        <p>
+          useContext + useReducer
+        </p>
+      </div>
+
+      <CounterDisplay />
+
+      <CounterButtons />
+
+      <div className="info">
+        <p>
+          State and dispatch are shared through Context
+        </p>
+      </div>
+
+    </div>
+  );
+}
+
+export default Counter;
+
+3. CounterButtons.jsx
+======================
+import { useContext } from "react";
+import { CounterContext } from "./CounterContext";
+
+function CounterButtons() {
+  const { dispatch } = useContext(CounterContext);
+
+  const handleIncrement = () => {
+    dispatch({
+      type: "INCREMENT"
+    });
+  };
+
+  const handleDecrement = () => {
+    dispatch({
+      type: "DECREMENT"
+    });
+  };
+
+  const handleReset = () => {
+    dispatch({
+      type: "RESET"
+    });
+  };
+
+  return (
+    <div className="button-container">
+      <button
+        className="btn increment"
+        onClick={handleIncrement}
+      >
+        + Increment
+      </button>
+
+      <button
+        className="btn decrement"
+        onClick={handleDecrement}
+      >
+        − Decrement
+      </button>
+
+      <button
+        className="btn reset"
+        onClick={handleReset}
+      >
+        ↻ Reset
+      </button>
+    </div>
+  );
+}
+
+export default CounterButtons;
+
+4.CounterContext.jsx
+====================
+import { createContext, useReducer } from "react";
+
+// Create Context
+export const CounterContext = createContext();
+
+// Initial State
+const initialState = {
+  count: 0
+};
+
+// Reducer
+function counterReducer(state, action) {
+  switch (action.type) {
+    case "INCREMENT":
+      return {
+        ...state,
+        count: state.count + 1
+      };
+
+    case "DECREMENT":
+      return {
+        ...state,
+        count: state.count - 1
+      };
+
+    case "RESET":
+      return {
+        ...state,
+        count: 0
+      };
+
+    default:
+      return state;
+  }
+}
+
+// Context Provider
+export function CounterProvider({ children }) {
+  const [state, dispatch] = useReducer(
+    counterReducer,
+    initialState
+  );
+
+  return (
+    <CounterContext.Provider
+      value={{ state, dispatch }}
+    >
+      {children}
+    </CounterContext.Provider>
+  );
+}
+
+5. CounterDisplay.jsx
+======================
+import { useContext } from "react";
+import { CounterContext } from "./CounterContext";
+
+function CounterDisplay() {
+  const { state } = useContext(CounterContext);
+
+  return (
+    <div className="counter-display">
+      <span className="count-label">
+        Current Count
+      </span>
+
+      <h1>{state.count}</h1>
+    </div>
+  );
+}
+
+export default CounterDisplay;
+
+6.index.css
+===========
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f7fb;
+}
+
+.app {
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+}
+
+/* Main Card */
+
+.counter-card {
+  width: 100%;
+  max-width: 500px;
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+
+  text-align: center;
+}
+
+/* Header */
+
+.header h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: #222;
+}
+
+.header p {
+  font-size: 16px;
+  color: #777;
+}
+
+/* Counter Display */
+
+.counter-display {
+  margin: 35px 0;
+
+  padding: 30px;
+
+  border-radius: 16px;
+
+  background: #f7f9fc;
+
+  border: 1px solid #e5e9f0;
+}
+
+.count-label {
+  display: block;
+
+  font-size: 15px;
+
+  color: #777;
+
+  margin-bottom: 10px;
+}
+
+.counter-display h1 {
+  font-size: 72px;
+
+  color: #222;
+
+  font-weight: 700;
+}
+
+/* Buttons */
+
+.button-container {
+  display: flex;
+
+  gap: 12px;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: none;
+
+  padding: 13px 20px;
+
+  border-radius: 10px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.increment {
+  background: #22c55e;
+
+  color: white;
+}
+
+.decrement {
+  background: #ef4444;
+
+  color: white;
+}
+
+.reset {
+  background: #64748b;
+
+  color: white;
+}
+
+/* Information */
+
+.info {
+  margin-top: 30px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.info p {
+  color: #777;
+
+  font-size: 14px;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .counter-card {
+    padding: 25px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .counter-display h1 {
+    font-size: 56px;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+7. main.jsx
+============
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import App from "./App";
+import "./index.css";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+8.index.html
+============
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>React Context + Reducer</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
