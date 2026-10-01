@@ -1,0 +1,242 @@
+Task 9- Assignment: XO (Tic-Tac-Toe) Game
+
+
+1.App.css
+=========
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+
+.game-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin-bottom: 25px;
+}
+
+.board {
+  width: 330px;
+  height: 330px;
+  margin: 0 auto 25px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.cell {
+  width: 106px;
+  height: 106px;
+
+  font-size: 45px;
+  font-weight: bold;
+
+  border: 2px solid #333;
+  background-color: white;
+
+  cursor: pointer;
+}
+
+.cell:hover {
+  background-color: #e8e8e8;
+}
+
+.restart-button {
+  padding: 12px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+
+  background-color: #333;
+  color: white;
+
+  cursor: pointer;
+}
+
+.restart-button:hover {
+  background-color: #555;
+}
+
+2. App.jsx
+==========
+import { useState } from "react";
+import "./App.css";
+
+function App() {
+  // Store 9 cells of the board
+  const [board, setBoard] = useState(Array(9).fill(""));
+
+  // Store current player
+  const [player, setPlayer] = useState("X");
+
+  // Store winner
+  const [winner, setWinner] = useState(null);
+
+  // Winning combinations
+  const winningPatterns = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  // Check winner
+  const checkWinner = (newBoard) => {
+    for (let pattern of winningPatterns) {
+      const [a, b, c] = pattern;
+
+      if (
+        newBoard[a] &&
+        newBoard[a] === newBoard[b] &&
+        newBoard[a] === newBoard[c]
+      ) {
+        return newBoard[a];
+      }
+    }
+
+    // Check draw
+    if (newBoard.every((cell) => cell !== "")) {
+      return "Draw";
+    }
+
+    return null;
+  };
+
+  // Handle cell click
+  const handleClick = (index) => {
+    // Do nothing if cell is already filled or game is over
+    if (board[index] !== "" || winner) {
+      return;
+    }
+
+    // Create a copy of the board
+    const newBoard = [...board];
+
+    // Place X or O
+    newBoard[index] = player;
+
+    // Update board
+    setBoard(newBoard);
+
+    // Check winner
+    const result = checkWinner(newBoard);
+
+    if (result) {
+      setWinner(result);
+    } else {
+      // Switch player
+      setPlayer(player === "X" ? "O" : "X");
+    }
+  };
+
+  // Restart game
+  const restartGame = () => {
+    setBoard(Array(9).fill(""));
+    setPlayer("X");
+    setWinner(null);
+  };
+
+  return (
+    <div className="game-container">
+      <h1>XO Game</h1>
+
+      {!winner ? (
+        <h2>Player {player}'s Turn</h2>
+      ) : winner === "Draw" ? (
+        <h2>Game Draw!</h2>
+      ) : (
+        <h2>Player {winner} Wins! 🎉</h2>
+      )}
+
+      <div className="board">
+        {board.map((cell, index) => (
+          <button
+            key={index}
+            className="cell"
+            onClick={() => handleClick(index)}
+          >
+            {cell}
+          </button>
+        ))}
+      </div>
+
+      <button className="restart-button" onClick={restartGame}>
+        Restart Game
+      </button>
+    </div>
+  );
+}
+
+export default App;
+
+3. index.css
+============
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  font-family: inherit;
+}
+
+4.main.jsx
+==========
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+5.index.html
+============
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XO Game</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
