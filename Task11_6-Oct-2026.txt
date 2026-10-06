@@ -1,0 +1,379 @@
+Task 11 – Implement useSearchParams Hook with Pagination
+
+1. App.jsx
+==========
+import React from 'react'
+import { useSearchParams } from 'react-router-dom'
+import users from './data.js'
+
+export default function App() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Items per page
+  const limit = 5
+
+  // Get current page from URL query string (default to 1)
+  const page = parseInt(searchParams.get('page') || '1', 10)
+
+  // Calculate total pages and slice current page data
+  const totalPages = Math.ceil(users.length / limit)
+  const startIndex = (page - 1) * limit
+  const currentUsers = users.slice(startIndex, startIndex + limit)
+
+  return (
+    <div className="container">
+      <h1>User List</h1>
+      <p className="subtitle">Pagination with useSearchParams</p>
+
+      {/* User Table */}
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Age</th>
+              <th>City</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentUsers.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.age}</td>
+                <td>{user.city}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button 
+          disabled={page <= 1} 
+          onClick={() => setSearchParams({ page: (page - 1).toString() })}
+        >
+          Prev
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button 
+          disabled={page >= totalPages}
+          onClick={() => setSearchParams({ page: (page + 1).toString() })}
+        >
+          Next
+        </button>
+      </div>
+
+      <div className="url-info">
+        Current Page Query Parameter: <strong>Page={page}</strong>
+      </div>
+    </div>
+  )
+}
+
+2. data.js
+==========
+const users = [
+  {
+    id: 1,
+    name: "Stackly",
+    email: "stackly@example.com",
+    age: 30,
+    city: "Hyderabad",
+  },
+  {
+    id: 2,
+    name: "Thahera",
+    email: "thahera@example.com",
+    age: 28,
+    city: "Bangalore",
+  },
+  {
+    id: 3,
+    name: "Dharani",
+    email: "dharani@example.com",
+    age: 26,
+    city: "Chennai",
+  },
+  {
+    id: 4,
+    name: "murali",
+    email: "murali@example.com",
+    age: 32,
+    city: "Mumbai",
+  },
+  {
+    id: 5,
+    name: "Sneha Rao",
+    email: "sneha@example.com",
+    age: 25,
+    city: "Pune",
+  },
+  {
+    id: 6,
+    name: "Amit Patel",
+    email: "amit@example.com",
+    age: 31,
+    city: "Ahmedabad",
+  },
+  {
+    id: 7,
+    name: "Anjali Singh",
+    email: "anjali@example.com",
+    age: 27,
+    city: "Delhi",
+  },
+  {
+    id: 8,
+    name: "Kiran Reddy",
+    email: "kiran@example.com",
+    age: 29,
+    city: "Hyderabad",
+  },
+  {
+    id: 9,
+    name: "Ravi Teja",
+    email: "ravi@example.com",
+    age: 34,
+    city: "Warangal",
+  },
+  {
+    id: 10,
+    name: "Neha Kapoor",
+    email: "neha@example.com",
+    age: 24,
+    city: "Delhi",
+  },
+  {
+    id: 11,
+    name: "Suresh Kumar",
+    email: "suresh@example.com",
+    age: 35,
+    city: "Bangalore",
+  },
+  {
+    id: 12,
+    name: "Divya Sharma",
+    email: "divya@example.com",
+    age: 28,
+    city: "Chennai",
+  },
+  {
+    id: 13,
+    name: "Manoj Reddy",
+    email: "manoj@example.com",
+    age: 33,
+    city: "Hyderabad",
+  },
+  {
+    id: 14,
+    name: "Pooja Verma",
+    email: "pooja@example.com",
+    age: 26,
+    city: "Lucknow",
+  },
+  {
+    id: 15,
+    name: "Rohit Mehta",
+    email: "rohit@example.com",
+    age: 30,
+    city: "Mumbai",
+  },
+  {
+    id: 16,
+    name: "Swathi Rao",
+    email: "swathi@example.com",
+    age: 27,
+    city: "Pune",
+  },
+  {
+    id: 17,
+    name: "Naveen Kumar",
+    email: "naveen@example.com",
+    age: 31,
+    city: "Bangalore",
+  },
+  {
+    id: 18,
+    name: "Lakshmi Devi",
+    email: "lakshmi@example.com",
+    age: 29,
+    city: "Vijayawada",
+  },
+  {
+    id: 19,
+    name: "Ajay Singh",
+    email: "ajay@example.com",
+    age: 36,
+    city: "Jaipur",
+  },
+  {
+    id: 20,
+    name: "Meena Reddy",
+    email: "meena@example.com",
+    age: 25,
+    city: "Hyderabad",
+  },
+];
+
+export default users;
+
+3. index.css
+============
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+}
+
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 40px auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 10px;
+  overflow-x: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+thead {
+  background: #222;
+  color: white;
+}
+
+th,
+td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+  background: #f2f2f2;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-top: 25px;
+}
+
+.pagination button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #444;
+}
+
+.pagination button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+
+.url-info {
+  margin-top: 25px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  text-align: center;
+  color: #555;
+}
+
+.url-info strong {
+  margin-left: 8px;
+  color: #222;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 95%;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .pagination {
+    gap: 10px;
+  }
+
+  .pagination button {
+    padding: 8px 12px;
+  }
+}
+
+4. main.jsx
+===========
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>,
+)
+
+5. index.html
+=============
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task 11 - useSearchParams Pagination</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
