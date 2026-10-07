@@ -1,0 +1,334 @@
+Task 12 – Implement Custom Hook with Axios
+
+
+src/components
+==============
+1.UserCard.jsx
+==============
+function UserCard({ user }) {
+  return (
+    <div className="user-card">
+      <div className="user-header">
+        <div className="user-id">#{user.id}</div>
+        <h2>{user.name}</h2>
+      </div>
+
+      <div className="user-details">
+        <p>
+          <strong>Username:</strong> {user.username}
+        </p>
+
+        <p>
+          <strong>Email:</strong> {user.email}
+        </p>
+
+        <p>
+          <strong>Phone:</strong> {user.phone}
+        </p>
+
+        <p>
+          <strong>Website:</strong> {user.website}
+        </p>
+
+        <p>
+          <strong>City:</strong> {user.address.city}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default UserCard;
+
+
+src/hooks
+==========
+2. useFetchData.js
+===================
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+function useFetchData(url) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await axios.get(url);
+
+        setData(response.data);
+      } catch (error) {
+        setError("Failed to fetch data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [url]);
+
+  return {
+    data,
+    loading,
+    error,
+  };
+}
+
+export default useFetchData;
+
+3. App.css
+===========
+.app {
+  min-height: 100vh;
+}
+
+.app-header {
+  text-align: center;
+  padding: 40px 20px;
+  background: #1f2937;
+  color: white;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 36px;
+}
+
+.app-header p {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+.user-count {
+  margin-bottom: 25px;
+  font-size: 18px;
+  color: #374151;
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.user-card {
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+}
+
+.user-header {
+  position: relative;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 15px;
+}
+
+.user-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+  padding-right: 45px;
+}
+
+.user-id {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #2563eb;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.user-details p {
+  margin: 12px 0;
+  line-height: 1.5;
+  color: #4b5563;
+  word-break: break-word;
+}
+
+.user-details strong {
+  color: #111827;
+}
+
+.status {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+}
+
+.error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 10px;
+}
+
+.loading {
+  color: #2563eb;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .user-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .user-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header h1 {
+    font-size: 28px;
+  }
+
+  .container {
+    padding: 20px 15px;
+  }
+}
+
+4.App.jsx
+=========
+import useFetchData from "./hooks/useFetchData";
+import UserCard from "./components/UserCard";
+
+function App() {
+  const API_URL = "https://jsonplaceholder.typicode.com/users";
+
+  const { data, loading, error } = useFetchData(API_URL);
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>User Management</h1>
+        <p>Users fetched using a reusable custom hook and Axios</p>
+      </header>
+
+      <main className="container">
+
+        {/* Loading State */}
+        {loading && (
+          <div className="status loading">
+            <div className="spinner"></div>
+            <p>Loading users...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!loading && error && (
+          <div className="status error">
+            <h2>Error</h2>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Success State */}
+        {!loading && !error && (
+          <>
+            <div className="user-count">
+              Total Users: <strong>{data.length}</strong>
+            </div>
+
+            <div className="user-grid">
+              {data.map((user) => (
+                <UserCard
+                  key={user.id}
+                  user={user}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+      </main>
+    </div>
+  );
+}
+
+export default App;
+
+5. index.css
+============
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f3f4f6;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+6.main.jsx
+===========
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import "./App.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+7.index.html
+============
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
