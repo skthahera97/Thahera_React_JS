@@ -1,0 +1,837 @@
+Task 12 – Implement Custom Hook with Axios
+
+react-crud-fetch
+----------------
+
+src/components
+==============
+1.UserForm.jsx
+==============
+import React, { useState, useEffect } from "react";
+
+const UserForm = ({ currentUser, onSaveUser, onCancelEdit }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    phone: "",
+    website: "",
+    city: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  // When editing, populate form fields with the selected user's details
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        name: currentUser.name || "",
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+        phone: currentUser.phone || "",
+        website: currentUser.website || "",
+        city: currentUser.address?.city || currentUser.city || "",
+      });
+    } else {
+      resetForm();
+    }
+  }, [currentUser]);
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      username: "",
+      email: "",
+      phone: "",
+      website: "",
+      city: "",
+    });
+    setErrors({});
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.username.trim()) newErrors.username = "Username is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email address";
+    }
+    if (!formData.phone.trim()) newErrors.phone = "Phone is required";
+    if (!formData.city.trim()) newErrors.city = "City is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    onSaveUser(formData);
+    if (!currentUser) {
+      resetForm();
+    }
+  };
+
+  return (
+    <div className="card">
+      <h2>{currentUser ? "Edit User" : "Add New User"}</h2>
+      <form onSubmit={handleSubmit} className="form-grid">
+        <div className="form-group">
+          <label>Name *</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="John Doe"
+          />
+          {errors.name && <span className="error-text">{errors.name}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Username *</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="johndoe"
+          />
+          {errors.username && <span className="error-text">{errors.username}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Email *</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="john@example.com"
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Phone *</label>
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="1-770-736-8031"
+          />
+          {errors.phone && <span className="error-text">{errors.phone}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Website</label>
+          <input
+            type="text"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+            placeholder="hildegard.org"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>City *</label>
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="Gwenborough"
+          />
+          {errors.city && <span className="error-text">{errors.city}</span>}
+        </div>
+
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary">
+            {currentUser ? "Update User" : "Add User"}
+          </button>
+          {currentUser && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onCancelEdit}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default UserForm;
+
+2. UserTable.jsx
+=================
+import React from "react";
+
+const UserTable = ({ users, onEdit, onDelete }) => {
+  if (users.length === 0) {
+    return <div className="no-data">No users found.</div>;
+  }
+
+  return (
+    <div className="table-container card">
+      <h2>User Directory</h2>
+      <table className="user-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Website</th>
+            <th>City</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => {
+            const cityName =
+              typeof user.address === "object"
+                ? user.address?.city
+                : user.city || "N/A";
+
+            return (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.name}</td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{user.phone}</td>
+                <td>{user.website || "N/A"}</td>
+                <td>{cityName}</td>
+                <td className="action-buttons">
+                  <button
+                    className="btn btn-edit"
+                    onClick={() => onEdit(user)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-delete"
+                    onClick={() => onDelete(user.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default UserTable;
+
+3.App.css
+=========
+.counter {
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+  margin-bottom: 24px;
+
+  &:hover {
+    border-color: var(--accent-border);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.hero {
+  position: relative;
+
+  .base,
+  .framework,
+  .vite {
+    inset-inline: 0;
+    margin: 0 auto;
+  }
+
+  .base {
+    width: 170px;
+    position: relative;
+    z-index: 0;
+  }
+
+  .framework,
+  .vite {
+    position: absolute;
+  }
+
+  .framework {
+    z-index: 1;
+    top: 34px;
+    height: 28px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+      scale(1.4);
+  }
+
+  .vite {
+    z-index: 0;
+    top: 107px;
+    height: 26px;
+    width: auto;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
+      scale(0.8);
+  }
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+
+  & > div {
+    flex: 1 1 0;
+    padding: 32px;
+    @media (max-width: 1024px) {
+      padding: 24px 20px;
+    }
+  }
+
+  .icon {
+    margin-bottom: 16px;
+    width: 22px;
+    height: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+
+  .logo {
+    height: 18px;
+  }
+
+  a {
+    color: var(--text-h);
+    font-size: 16px;
+    border-radius: 6px;
+    background: var(--social-bg);
+    display: flex;
+    padding: 6px 12px;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: var(--shadow);
+    }
+    .button-icon {
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    li {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    a {
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+  @media (max-width: 1024px) {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4.5px;
+    border: 5px solid transparent;
+  }
+
+  &::before {
+    left: 0;
+    border-left-color: var(--border);
+  }
+  &::after {
+    right: 0;
+    border-right-color: var(--border);
+  }
+}
+
+
+4.App.jsx
+==========
+import React, { useState, useEffect } from "react";
+import UserForm from "./components/UserForm";
+import UserTable from "./components/UserTable";
+
+const API_URL = "https://jsonplaceholder.typicode.com/users";
+
+function App() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [notification, setNotification] = useState("");
+
+  // Helper function for temporary status messages
+  const showNotification = (msg) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(""), 4000);
+  };
+
+  // READ - GET: Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) {
+        throw new Error(`Error fetching users: ${response.statusText}`);
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (err) {
+      setError(err.message || "Failed to fetch user data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // CREATE - POST & UPDATE - PUT/PATCH
+  const handleSaveUser = async (formData) => {
+    setError(null);
+
+    // Prepare address object structure matching JSONPlaceholder
+    const payload = {
+      ...formData,
+      address: { city: formData.city },
+    };
+
+    if (currentUser) {
+      // UPDATE (PUT)
+      try {
+        const response = await fetch(`${API_URL}/${currentUser.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update user.");
+        }
+
+        const updatedUser = await response.json();
+
+        // Update UI locally (keeping existing structure intact)
+        setUsers((prevUsers) =>
+          prevUsers.map((u) =>
+            u.id === currentUser.id
+              ? { ...updatedUser, id: currentUser.id }
+              : u
+          )
+        );
+
+        setCurrentUser(null);
+        showNotification("User updated successfully!");
+      } catch (err) {
+        setError(err.message || "An error occurred while updating the user.");
+      }
+    } else {
+      // CREATE (POST)
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create user.");
+        }
+
+        const createdUser = await response.json();
+
+        // Assign a unique local ID if JSONPlaceholder returns duplicates
+        const newId =
+          users.length > 0 ? Math.max(...users.map((u) => u.id)) + 1 : 1;
+        const newUserObj = { ...createdUser, id: newId };
+
+        setUsers((prevUsers) => [newUserObj, ...prevUsers]);
+        showNotification("User created successfully!");
+      } catch (err) {
+        setError(err.message || "An error occurred while creating the user.");
+      }
+    }
+  };
+
+  // DELETE
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    setError(null);
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user.");
+      }
+
+      // Remove from UI state
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+
+      if (currentUser && currentUser.id === id) {
+        setCurrentUser(null);
+      }
+
+      showNotification("User deleted successfully!");
+    } catch (err) {
+      setError(err.message || "An error occurred while deleting the user.");
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setCurrentUser(user);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setCurrentUser(null);
+  };
+
+  return (
+    <div className="app-container">
+      <header className="app-header">
+        <h1>React Fetch API CRUD Application</h1>
+      </header>
+
+      {notification && <div className="toast success">{notification}</div>}
+      {error && <div className="toast error">{error}</div>}
+
+      <main className="content">
+        <UserForm
+          currentUser={currentUser}
+          onSaveUser={handleSaveUser}
+          onCancelEdit={handleCancelEdit}
+        />
+
+        {loading ? (
+          <div className="loading-spinner">Loading users...</div>
+        ) : (
+          <UserTable
+            users={users}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteUser}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
+
+5.index.css
+===========
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  background-color: #f4f6f9;
+  color: #333;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  color: #1a202c;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  color: #2d3748;
+}
+
+/* Form Styles */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #4a5568;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #3182ce;
+}
+
+.error-text {
+  color: #e53e3e;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Button Styles */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background-color: #3182ce;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #718096;
+  color: white;
+}
+
+.btn-edit {
+  background-color: #ed8936;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.btn-delete {
+  background-color: #e53e3e;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+/* Table Styles */
+.table-container {
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.user-table th {
+  background-color: #edf2f7;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.user-table tr:hover {
+  background-color: #f7fafc;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* UI Feedback */
+.toast {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.toast.success {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.toast.error {
+  background-color: #fed7d7;
+  color: #742a2a;
+}
+
+.loading-spinner,
+.no-data {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #718096;
+}
+
+6.main.jsx
+=========
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+7.index.html
+============
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>react-crud-fetch</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
