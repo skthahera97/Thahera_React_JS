@@ -1,0 +1,418 @@
+Task 14 – Implement Redux
+
+src/app
+=======
+1.store.js
+==========
+import { configureStore } from "@reduxjs/toolkit";
+import userFormReducer from "../features/userForm/userFormSlice";
+
+export const store = configureStore({
+  reducer: {
+    userForm: userFormReducer,
+  },
+});
+
+components
+==========
+2.ComponentA.css
+================
+.form-panel {
+  background: #fff;
+  border: 1px solid #e4e8f0;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 8px 30px rgba(31, 45, 80, 0.06);
+}
+.panel-heading { margin-bottom: 25px; }
+.step-label {
+  display: inline-block; color: #5b55d9; font-size: 11px;
+  font-weight: 800; letter-spacing: 1.5px; margin-bottom: 10px;
+}
+.panel-heading h2 { margin: 0 0 8px; font-size: 24px; color: #19233c; }
+.panel-heading p { margin: 0; color: #778198; font-size: 14px; line-height: 1.6; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.form-field.full-width { grid-column: 1 / -1; }
+.form-field label { font-size: 13px; font-weight: 700; color: #39445d; }
+.form-field input, .form-field select {
+  box-sizing: border-box; width: 100%; min-height: 46px; padding: 12px 13px;
+  background: #fafbfe; border: 1px solid #dce2ed; border-radius: 9px;
+  font: inherit; font-size: 14px; color: #202a42; outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-field input:focus, .form-field select:focus {
+  border-color: #655ce8; box-shadow: 0 0 0 3px rgba(101, 92, 232, .12);
+}
+.form-field input::placeholder { color: #a1a9b9; }
+.submit-button {
+  width: 100%; margin-top: 25px; padding: 14px 18px; background: #5b55d9;
+  color: #fff; border: none; border-radius: 10px; font-size: 14px;
+  font-weight: 700; cursor: pointer; transition: background .2s, transform .2s;
+}
+.submit-button:hover { background: #4841c2; transform: translateY(-1px); }
+.submit-button span { font-size: 19px; margin-right: 6px; }
+@media (max-width: 480px) {
+  .form-panel { padding: 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-field.full-width { grid-column: auto; }
+}
+
+
+3.ComponentA.jsx
+=================
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addUser } from "../features/userForm/userFormSlice";
+import "./ComponentA.css";
+
+const initialForm = {
+  name: "",
+  email: "",
+  phone: "",
+  city: "",
+  role: "",
+};
+
+function ComponentA() {
+  const [formData, setFormData] = useState(initialForm);
+  const dispatch = useDispatch();
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    dispatch(addUser(formData));
+    setFormData({ ...initialForm });
+  };
+
+  return (
+    <section className="form-panel">
+      <div className="panel-heading">
+        <span className="step-label">COMPONENT A</span>
+        <h2>User Registration</h2>
+        <p>Enter your details to add a record to Redux.</p>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <div className="form-field">
+            <label htmlFor="name">Full Name</label>
+            <input id="name" name="name" type="text" placeholder="Enter your full name"
+              value={formData.name} onChange={handleChange} required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="email">Email Address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com"
+              value={formData.email} onChange={handleChange} required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="phone">Phone Number</label>
+            <input id="phone" name="phone" type="tel" placeholder="Enter phone number"
+              value={formData.phone} onChange={handleChange} required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="city">City</label>
+            <input id="city" name="city" type="text" placeholder="Enter your city"
+              value={formData.city} onChange={handleChange} required />
+          </div>
+          <div className="form-field full-width">
+            <label htmlFor="role">Role</label>
+            <select id="role" name="role" value={formData.role} onChange={handleChange} required>
+              <option value="">Select your role</option>
+              <option value="Frontend Developer">Frontend Developer</option>
+              <option value="Backend Developer">Backend Developer</option>
+              <option value="Full Stack Developer">Full Stack Developer</option>
+              <option value="AI Engineer">AI Engineer</option>
+              <option value="Data Scientist">Data Scientist</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" className="submit-button"><span>+</span> Save User to Redux</button>
+      </form>
+    </section>
+  );
+}
+
+export default ComponentA;
+
+4.ComponentB.css
+================
+.users-panel {
+  background: #fff; border: 1px solid #e4e8f0; border-radius: 18px;
+  padding: 28px; box-shadow: 0 8px 30px rgba(31, 45, 80, .06); min-width: 0;
+}
+.users-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 25px; }
+.users-heading h2 { color: #19233c; font-size: 24px; margin: 0 0 8px; }
+.users-heading p { color: #778198; font-size: 14px; line-height: 1.6; margin: 0; }
+.record-count {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0; min-width: 66px; min-height: 66px; border-radius: 13px;
+  background: #f0efff; color: #554bc8;
+}
+.record-count strong { font-size: 24px; }
+.record-count span { font-size: 11px; font-weight: 700; }
+.users-list { display: flex; flex-direction: column; gap: 15px; }
+.user-card { padding: 18px; border: 1px solid #e6eaf2; border-radius: 13px; background: #fcfcff; min-width: 0; }
+.user-card-top { display: flex; align-items: center; gap: 12px; min-width: 0; margin-bottom: 20px; }
+.user-avatar {
+  display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+  flex-shrink: 0; background: #e9e7ff; color: #554bc8; border-radius: 12px;
+  font-size: 19px; font-weight: 800;
+}
+.user-identity { flex: 1; min-width: 0; }
+.user-identity h3 { margin: 0 0 7px; color: #202a42; font-size: 16px; overflow-wrap: anywhere; }
+.role-badge { display: inline-block; padding: 5px 9px; border-radius: 20px; background: #e6f7ef; color: #19865a; font-size: 11px; font-weight: 700; }
+.user-id { color: #9099ac; font-size: 11px; flex-shrink: 0; }
+.user-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 17px; border-top: 1px solid #e9ecf3; }
+.detail-item { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.detail-label { color: #8b94a7; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+.detail-value { color: #39445d; font-size: 13px; overflow-wrap: anywhere; }
+.clear-button {
+  width: 100%; margin-top: 20px; padding: 12px; background: #fff2f1; color: #c34843;
+  border: 1px solid #f8d9d7; border-radius: 9px; font-weight: 700; cursor: pointer;
+}
+.clear-button:hover { background: #ffe5e3; }
+.empty-state { padding: 35px 15px; text-align: center; border: 1px dashed #dce2ed; border-radius: 12px; background: #fafbfe; }
+.empty-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px;
+  background: #eeedff; color: #5b55d9; border-radius: 50%; font-size: 24px;
+}
+.empty-state h3 { color: #202a42; margin: 14px 0 8px; font-size: 16px; }
+.empty-state p { max-width: 280px; margin: 0 auto; color: #778198; font-size: 13px; line-height: 1.7; }
+@media (max-width: 480px) {
+  .users-panel { padding: 20px; }
+  .users-heading { flex-wrap: wrap; }
+  .users-heading h2 { font-size: 21px; }
+  .user-card { padding: 14px; }
+  .user-details { grid-template-columns: 1fr; }
+}
+
+
+5.ComponentB.jsx
+=================
+import { useDispatch, useSelector } from "react-redux";
+import { clearUsers } from "../features/userForm/userFormSlice";
+import "./ComponentB.css";
+
+function ComponentB() {
+  const users = useSelector((state) => state.userForm.users);
+  const dispatch = useDispatch();
+
+  return (
+    <section className="users-panel">
+      <div className="users-heading">
+        <div>
+          <span className="step-label">COMPONENT B</span>
+          <h2>Stored User Data</h2>
+          <p>Records retrieved from the global Redux store.</p>
+        </div>
+        <div className="record-count">
+          <strong>{users.length}</strong>
+          <span>{users.length === 1 ? "Record" : "Records"}</span>
+        </div>
+      </div>
+
+      {users.length > 0 ? (
+        <>
+          <div className="users-list">
+            {users.map((user) => (
+              <article className="user-card" key={user.id}>
+                <div className="user-card-top">
+                  <div className="user-avatar">{user.name.charAt(0).toUpperCase()}</div>
+                  <div className="user-identity">
+                    <h3>{user.name}</h3>
+                    <span className="role-badge">{user.role}</span>
+                  </div>
+                  <span className="user-id">#{user.id.slice(0, 6)}</span>
+                </div>
+                <div className="user-details">
+                  <div className="detail-item">
+                    <span className="detail-label">EMAIL</span>
+                    <span className="detail-value">{user.email}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">PHONE</span>
+                    <span className="detail-value">{user.phone}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">CITY</span>
+                    <span className="detail-value">{user.city}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+          <button type="button" className="clear-button" onClick={() => dispatch(clearUsers())}>
+            Clear All Records
+          </button>
+        </>
+      ) : (
+        <div className="empty-state">
+          <div className="empty-icon">↗</div>
+          <h3>No records yet</h3>
+          <p>Submit the form in Component A. Your saved details will appear here automatically.</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default ComponentB;
+
+
+features
+========
+6.userFormSlice.js
+==================
+import { createSlice, nanoid } from "@reduxjs/toolkit";
+
+const initialState = {
+  users: [],
+};
+
+const userFormSlice = createSlice({
+  name: "userForm",
+  initialState,
+  reducers: {
+    addUser: {
+      reducer: (state, action) => {
+        state.users.push(action.payload);
+      },
+      prepare: (userData) => ({
+        payload: {
+          ...userData,
+          id: nanoid(),
+        },
+      }),
+    },
+    clearUsers: (state) => {
+      state.users = [];
+    },
+  },
+});
+
+export const { addUser, clearUsers } = userFormSlice.actions;
+export default userFormSlice.reducer;
+
+7.App.css
+=========
+.app-container { width: min(1440px, 100%); box-sizing: border-box; margin: 0 auto; padding: 35px 5%; }
+.app-header { display: flex; align-items: center; gap: 14px; padding-bottom: 25px; border-bottom: 1px solid #e6eaf2; }
+.app-logo { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 14px; background: #5b55d9; color: #fff; font-size: 17px; font-weight: 800; }
+.app-header h1 { margin: 0 0 5px; color: #19233c; font-size: 21px; }
+.app-header p { margin: 0; color: #778198; font-size: 13px; }
+.welcome-section { padding: 34px 0 30px; }
+.dashboard-tag { color: #5b55d9; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; }
+.welcome-section h2 { margin: 10px 0; color: #19233c; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.7px; }
+.welcome-section p { max-width: 620px; margin: 0; color: #778198; font-size: 15px; line-height: 1.8; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px; align-items: start; }
+.app-footer { padding: 28px 0 5px; color: #929bad; text-align: center; font-size: 12px; }
+@media (max-width: 900px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .app-container { padding: 25px 4%; }
+}
+@media (max-width: 480px) {
+  .app-header h1 { font-size: 17px; }
+  .welcome-section { padding-top: 26px; }
+}
+
+8.App.jsx
+=========
+
+import React from "react";
+import ComponentA from "./components/ComponentA";
+import ComponentB from "./components/ComponentB";
+import "./App.css";
+
+function App() {
+  return (
+    <main className="app-container">
+      <header className="app-header">
+        <div className="app-logo">RT</div>
+        <div>
+          <h1>Redux Toolkit Dashboard</h1>
+          <p>Global State Management with React</p>
+        </div>
+      </header>
+
+      <section className="welcome-section">
+        <span className="dashboard-tag">
+          REACT + REDUX TOOLKIT
+        </span>
+        <h2>Manage your user records</h2>
+        <p>
+          Submit user information once and access the shared
+          state across multiple components.
+        </p>
+      </section>
+
+      <div className="dashboard-grid">
+        <ComponentA />
+        <ComponentB />
+      </div>
+
+      <footer className="app-footer">
+        Built with React, Redux Toolkit and React Redux
+      </footer>
+    </main>
+  );
+}
+
+export default App;
+
+9. index.css
+============
+* { box-sizing: border-box; }
+html { min-width: 320px; min-height: 100%; }
+body {
+  margin: 0; min-width: 320px; min-height: 100vh;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  background: #f5f7fc; color: #202a42; -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid rgba(91, 85, 217, .3); outline-offset: 2px;
+}
+::selection { background: #dedcff; color: #25205d; }
+
+
+10.main.jsx
+===========
+
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
+import App from "./App";
+import "./index.css";
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </React.StrictMode>
+);
+
+11.index.html
+=============
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7fc" />
+    <title>Redux Toolkit Dashboard</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
